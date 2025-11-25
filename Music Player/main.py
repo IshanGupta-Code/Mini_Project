@@ -40,11 +40,27 @@ def main():
         print("Audio Initilization Failed! ", e)
         return
     
-    folder = "Music"
+    # Resolve the music folder relative to this script's directory so the
+    # program works independent of the current working directory.
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    folder = os.path.join(base_dir, "Music")
 
     if not os.path.isdir(folder):
-        print(f"Folder '{folder}' not found")
-        return
+        print(f"Folder not found at: {folder}")
+
+        # Offer to create the folder so users running from the repo root
+        # (or elsewhere) can quickly set up the expected structure.
+        answer = input("Would you like to create the folder now? (Y/N): ").strip().upper()
+        if answer == "Y":
+            try:
+                os.makedirs(folder, exist_ok=True)
+                print(f"Created folder: {folder}\nAdd your .mp3 files into this directory and re-run the player.")
+            except OSError as e:
+                print("Failed to create folder:", e)
+            return
+        else:
+            print("Please create the folder and add .mp3 files, or run the script from the directory containing your Music folder.")
+            return
     
     mp3_files = [file for file in os.listdir(folder) if file.endswith(".mp3")]
 
